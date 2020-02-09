@@ -1,13 +1,21 @@
 package com.example.samla;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Environment;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Date;
 import java.util.Stack;
 
 public final class UserInterfaceHierarchy {
@@ -26,11 +34,11 @@ public final class UserInterfaceHierarchy {
         stack.push(Pair.create("", root));
 
         while (!stack.empty()) {
-            final Pair<String, View> p = stack.pop();
-            final View v = p.second;
+            final Pair<String, View> pair = stack.pop();
+            final View v = pair.second;
 
-            final boolean isLastOnLevel = stack.empty() || !p.first.equals(stack.peek().first);
-            final String graphics = "" + p.first + (isLastOnLevel ? "└── " : "├── ");
+            final boolean isLastOnLevel = stack.empty() || !pair.first.equals(stack.peek().first);
+            final String graphics = "" + pair.first + (isLastOnLevel ? "└── " : "├── ");
 
             final String className = v.getClass().getSimpleName();
             final String line = graphics + className + " id=" + v.getId() + resolveIdToName(r, v);
@@ -40,7 +48,7 @@ public final class UserInterfaceHierarchy {
             if (v instanceof ViewGroup) {
                 final ViewGroup vg = (ViewGroup) v;
                 for (int i = vg.getChildCount() - 1; i >= 0; i--) {
-                    stack.push(Pair.create(p.first + (isLastOnLevel ? "    " : "│   "), vg.getChildAt(i)));
+                    stack.push(Pair.create(pair.first + (isLastOnLevel ? "    " : "│   "), vg.getChildAt(i)));
                 }
             }
         }
@@ -58,6 +66,49 @@ public final class UserInterfaceHierarchy {
         } catch (Throwable ignored) {
             return "";
         }
+    }
+
+    public static void takeScreenShot(Activity activity) {
+        Date now = new Date();
+        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+
+        try {
+            // image naming and path  to include sd card  appending name you choose for file
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
+
+            // create bitmap screen capture
+            View v1 = activity.getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            v1.setDrawingCacheEnabled(false);
+
+            File imageFile = new File(mPath);
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+
+            openScreenshot(activity, imageFile);
+        } catch (Throwable e) {
+            // Several error may come out with file handling or DOM
+            e.printStackTrace();
+        }
+//        try {
+//            Process process = Runtime.getRuntime().exec("input keyevent 120");
+//        }
+//        catch (IOException exception) {
+//            exception.printStackTrace();
+//        }
+    }
+
+    private static void openScreenshot(Activity activity, File imageFile) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(imageFile);
+        intent.setDataAndType(uri, "image/*");
+        activity.startActivity(intent);
     }
 
 }
