@@ -1,6 +1,8 @@
 package com.example.samla;
 
 import android.app.Activity;
+import android.app.Instrumentation;
+import android.os.Environment;
 import android.util.Log;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -52,6 +54,9 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
     @OnLifecycleEvent(ON_STOP)
     void onStop () {
         Log.i(TAG, "onStop");
+
+        String hierarchy = UserInterfaceHierarchy.logViewHierarchy(applicationActivity);
+        Log.i(TAG, "UI Hierarchy: " + hierarchy);
     }
 
     @OnLifecycleEvent(ON_DESTROY)
