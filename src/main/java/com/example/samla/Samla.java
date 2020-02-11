@@ -57,6 +57,8 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
 
         String hierarchy = UserInterfaceHierarchy.logViewHierarchy(applicationActivity);
         Log.i(TAG, "UI Hierarchy: " + hierarchy);
+
+        UserInterfaceHierarchy.takeScreenShot(applicationActivity);
     }
 
     @OnLifecycleEvent(ON_DESTROY)
