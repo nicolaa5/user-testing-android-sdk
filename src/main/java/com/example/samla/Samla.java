@@ -39,6 +39,7 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
     @OnLifecycleEvent(ON_CREATE)
     void onCreated(LifecycleOwner lifecycleOwner) {
         Log.i(TAG, "onCreated");
+        UserInterfaceHierarchy.setMenuListener(applicationActivity.findViewById(android.R.id.content));
     }
 
     @OnLifecycleEvent(ON_RESUME)
