@@ -6,11 +6,13 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +21,7 @@ import java.util.Date;
 import java.util.Stack;
 
 public final class UserInterfaceHierarchy {
+    private final static String TAG = UserInterfaceHierarchy.class.getSimpleName();
     /** Pint into log activity views hierarchy. */
     @NonNull
     public static String logViewHierarchy(@NonNull final Activity activity) {
@@ -73,41 +76,36 @@ public final class UserInterfaceHierarchy {
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
 
         try {
-            // image naming and path  to include sd card  appending name you choose for file
-            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
-
             // create bitmap screen capture
             View v1 = activity.getWindow().getDecorView().getRootView();
             v1.setDrawingCacheEnabled(true);
             Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
             v1.setDrawingCacheEnabled(false);
 
-            File imageFile = new File(mPath);
+            File image = new File(activity.getFilesDir().toString() + "/" + now + ".jpg");
+            FileOutputStream outputStream = new FileOutputStream(image);
 
-            FileOutputStream outputStream = new FileOutputStream(imageFile);
             int quality = 100;
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             outputStream.flush();
             outputStream.close();
 
-            openScreenshot(activity, imageFile);
+            // openScreenshot(activity, image);
         } catch (Throwable e) {
             // Several error may come out with file handling or DOM
             e.printStackTrace();
         }
-//        try {
-//            Process process = Runtime.getRuntime().exec("input keyevent 120");
-//        }
-//        catch (IOException exception) {
-//            exception.printStackTrace();
-//        }
     }
 
     private static void openScreenshot(Activity activity, File imageFile) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        Uri uri = Uri.fromFile(imageFile);
-        intent.setDataAndType(uri, "image/*");
+
+        Uri uri = FileProvider.getUriForFile(activity,activity.getApplicationContext().getPackageName() + ".fileprovider", imageFile);
+
+        Intent intent = new Intent()
+                .setAction(Intent.ACTION_VIEW)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                .setDataAndType(uri, "image/*");
+
         activity.startActivity(intent);
     }
 
