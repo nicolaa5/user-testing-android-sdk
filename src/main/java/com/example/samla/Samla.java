@@ -1,13 +1,13 @@
 package com.example.samla;
 
 import android.app.Activity;
-import android.app.Instrumentation;
-import android.os.Environment;
 import android.util.Log;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
+import com.example.samla.funnel.FunnelManager;
+import com.example.samla.userinterface.UserInterfaceHierarchy;
 
 import static androidx.lifecycle.Lifecycle.Event.*;
 
@@ -16,9 +16,11 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
 
     private Activity applicationActivity;
     private Lifecycle lifecycle;
+    private FunnelManager funnelManager;
 
     public Samla(Activity activity) {
         this.applicationActivity = activity;
+        funnelManager = new FunnelManager(applicationActivity);
     }
 
     public static Samla withActivity(Activity activity) {
@@ -34,6 +36,10 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
 
     public Activity getApplicationActivity() {
         return applicationActivity;
+    }
+
+    public FunnelManager getFunnelManager() {
+        return funnelManager;
     }
 
     @OnLifecycleEvent(ON_CREATE)
