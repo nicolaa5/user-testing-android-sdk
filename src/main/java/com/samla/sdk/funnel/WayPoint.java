@@ -1,4 +1,4 @@
-package com.example.samla.funnel;
+package com.samla.sdk.funnel;
 
 public class WayPoint {
     private int invocations;

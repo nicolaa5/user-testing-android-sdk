@@ -1,4 +1,4 @@
-package com.example.samla.userinterface;
+package com.samla.sdk.userinterface;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -47,9 +47,10 @@ public final class UserInterfaceHierarchy {
             final String dimensions = " width: " + v.getWidth() + " height: " + v.getHeight();
             final String location = " X: " + v.getX() + " Y: " + v.getY();
             final String pivot = " pivotX: " + v.getPivotX() + " pivotY: " + v.getPivotY();
+            final String tags = " tag: " + v.getTag();
             final String color = (getBackgroundColor(v) != null ? " color: " + getBackgroundColor(v) : "");
             final String className = v.getClass().getSimpleName();
-            final String line = graphics + className + location + dimensions + color + " id=" + v.getId() + resolveIdToName(r, v);
+            final String line = graphics + className + "tag: " + tags + location + dimensions + color + " id=" + v.getId() + resolveIdToName(r, v);
 
             v.hasOnClickListeners();
             v.setOnLongClickListener(new View.OnLongClickListener() {

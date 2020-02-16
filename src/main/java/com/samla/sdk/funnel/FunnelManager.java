@@ -1,8 +1,8 @@
-package com.example.samla.funnel;
+package com.samla.sdk.funnel;
 
 import android.app.Activity;
 import android.util.Log;
-import com.example.samla.userinterface.ToastManager;
+import com.samla.sdk.userinterface.ToastManager;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ public class FunnelManager {
         this.activity = activity;
     }
 
-    public void reachedWayPoint (int wayPoint) {
+    public void reachedWayPoint (final int wayPoint) {
         wayPoints.add(new WayPoint(wayPoint));
         Log.i(TAG, "Waypoints: " + wayPoints.toString());
         ToastManager.makeToast(activity, "Reached Waypoint: " + wayPoint);

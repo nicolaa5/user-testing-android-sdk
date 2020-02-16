@@ -1,4 +1,4 @@
-package com.example.samla;
+package com.samla.sdk;
 
 import org.junit.Test;
 

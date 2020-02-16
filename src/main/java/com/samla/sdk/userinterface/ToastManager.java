@@ -1,4 +1,4 @@
-package com.example.samla.userinterface;
+package com.samla.sdk.userinterface;
 
 import android.app.Activity;
 import android.widget.Toast;

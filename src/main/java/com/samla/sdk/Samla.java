@@ -1,4 +1,4 @@
-package com.example.samla;
+package com.samla.sdk;
 
 import android.app.Activity;
 import android.util.Log;
@@ -6,8 +6,8 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
-import com.example.samla.funnel.FunnelManager;
-import com.example.samla.userinterface.UserInterfaceHierarchy;
+import com.samla.sdk.funnel.FunnelManager;
+import com.samla.sdk.userinterface.UserInterfaceHierarchy;
 
 import static androidx.lifecycle.Lifecycle.Event.*;
 
