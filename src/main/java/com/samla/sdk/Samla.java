@@ -22,6 +22,7 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
     private Activity applicationActivity;
     private Lifecycle lifecycle;
     private FunnelManager funnelManager;
+    private static boolean userFlowCreationEnabled = true;
 
     FirebaseAnalytics firebaseAnalytics;
     FirebaseAppLifecycleListener firebaseAppLifecycleListener;
@@ -35,6 +36,14 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
 
     public static Samla withActivity(Activity activity) {
         return new Samla(activity);
+    }
+
+    /**
+     * A userflow is a visual overview of an application's screens/navigation and structure
+     * @param enable: Enables/disables the creation of a userflow when building the application
+     */
+    public static void createUserFlow (Boolean enable) {
+           userFlowCreationEnabled = enable;
     }
 
     @Override
@@ -76,6 +85,11 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
         Log.i(TAG, "UI Hierarchy: " + hierarchy);
 
         UserInterfaceHierarchy.takeScreenShot(applicationActivity);
+
+        if (userFlowCreationEnabled) {
+            // Todo: Testing to send
+        }
+
     }
 
     @OnLifecycleEvent(ON_DESTROY)
