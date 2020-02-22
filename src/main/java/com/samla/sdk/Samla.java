@@ -6,7 +6,12 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
-import com.samla.sdk.funnel.FunnelManager;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseAppLifecycleListener;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.samla.sdk.analytics.funnel.FunnelManager;
 import com.samla.sdk.userinterface.UserInterfaceHierarchy;
 
 import static androidx.lifecycle.Lifecycle.Event.*;
@@ -17,6 +22,11 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
     private Activity applicationActivity;
     private Lifecycle lifecycle;
     private FunnelManager funnelManager;
+
+    FirebaseAnalytics firebaseAnalytics;
+    FirebaseAppLifecycleListener firebaseAppLifecycleListener;
+    FirebaseApp firebaseApp;
+    FirebaseOptions firebaseOptions;
 
     public Samla(Activity activity) {
         this.applicationActivity = activity;

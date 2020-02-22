@@ -1,11 +1,11 @@
-package com.samla.sdk.funnel;
+package com.samla.sdk.analytics.funnel;
 
 public class WayPoint {
     private int invocations;
     private int number;
     private int timestamp;
 
-    public WayPoint (int waypoint) {
+    WayPoint (int waypoint) {
         this.number = waypoint;
     }
 

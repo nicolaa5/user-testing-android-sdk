@@ -1,7 +1,9 @@
-package com.samla.sdk.funnel;
+package com.samla.sdk.analytics.funnel;
 
 import android.app.Activity;
 import android.util.Log;
+
+import com.samla.sdk.analytics.Analytics;
 import com.samla.sdk.userinterface.ToastManager;
 
 import java.util.ArrayList;
@@ -20,5 +22,6 @@ public class FunnelManager {
         wayPoints.add(new WayPoint(wayPoint));
         Log.i(TAG, "Waypoints: " + wayPoints.toString());
         ToastManager.makeToast(activity, "Reached Waypoint: " + wayPoint);
+        Analytics.getFirebaseAnalytics().setUserProperty("milestone", String.valueOf(wayPoint));
     }
 }
