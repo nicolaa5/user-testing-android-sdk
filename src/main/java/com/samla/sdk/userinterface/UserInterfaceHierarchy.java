@@ -1,13 +1,15 @@
-package com.example.samla;
+package com.samla.sdk.userinterface;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
 import android.util.Pair;
+import android.view.ContextMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -16,7 +18,6 @@ import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Stack;
 
@@ -43,8 +44,22 @@ public final class UserInterfaceHierarchy {
             final boolean isLastOnLevel = stack.empty() || !pair.first.equals(stack.peek().first);
             final String graphics = "" + pair.first + (isLastOnLevel ? "└── " : "├── ");
 
+            final String dimensions = " width: " + v.getWidth() + " height: " + v.getHeight();
+            final String location = " X: " + v.getX() + " Y: " + v.getY();
+            final String pivot = " pivotX: " + v.getPivotX() + " pivotY: " + v.getPivotY();
+            final String tags = " tag: " + v.getTag();
+            final String color = (getBackgroundColor(v) != null ? " color: " + getBackgroundColor(v) : "");
             final String className = v.getClass().getSimpleName();
-            final String line = graphics + className + " id=" + v.getId() + resolveIdToName(r, v);
+            final String line = graphics + className + "tag: " + tags + location + dimensions + color + " id=" + v.getId() + resolveIdToName(r, v);
+
+            v.hasOnClickListeners();
+            v.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    Log.i("LongClick: ", " X: " + view.getX() + " Y: " + view.getY());
+                    return false;
+                }
+            });
 
             output.append(line).append("\n");
 
@@ -57,6 +72,18 @@ public final class UserInterfaceHierarchy {
         }
 
         return output.toString();
+    }
+
+    public static void setMenuListener (View v) {
+
+        v.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+                for (int i = 0; i < contextMenu.size(); i++) {
+                    Log.i("Menu: ", i + ": " +  contextMenu.getItem(i));
+                }
+            }
+        });
     }
 
     /** @see <a href="https://stackoverflow.com/questions/10137692/how-to-get-resource-name-from-resource-id">Lookup resource name</a> */
@@ -107,6 +134,16 @@ public final class UserInterfaceHierarchy {
                 .setDataAndType(uri, "image/*");
 
         activity.startActivity(intent);
+    }
+
+    private static String getBackgroundColor(View view) {
+        Drawable drawable = view.getBackground();
+        if (drawable instanceof ColorDrawable) {
+            ColorDrawable colorDrawable = (ColorDrawable) drawable;
+
+            return String.format("#%06X", (0xFFFFFF & colorDrawable.getColor()));
+        }
+        return null;
     }
 
 }

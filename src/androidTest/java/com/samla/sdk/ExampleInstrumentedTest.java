@@ -1,4 +1,4 @@
-package com.example.samla;
+package com.samla.sdk;
 
 import android.content.Context;
 import androidx.test.InstrumentationRegistry;
@@ -6,7 +6,6 @@ import androidx.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import static org.junit.Assert.*;
 
 /**
@@ -23,4 +22,5 @@ public class ExampleInstrumentedTest {
 
         assertEquals("com.example.samla.test", appContext.getPackageName());
     }
+
 }

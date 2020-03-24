@@ -1,13 +1,18 @@
-package com.example.samla;
+package com.samla.sdk;
 
 import android.app.Activity;
-import android.app.Instrumentation;
-import android.os.Environment;
 import android.util.Log;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseAppLifecycleListener;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.samla.sdk.analytics.funnel.FunnelManager;
+import com.samla.sdk.userinterface.UserInterfaceHierarchy;
 
 import static androidx.lifecycle.Lifecycle.Event.*;
 
@@ -16,13 +21,29 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
 
     private Activity applicationActivity;
     private Lifecycle lifecycle;
+    private FunnelManager funnelManager;
+    private static boolean userFlowCreationEnabled = true;
+
+    FirebaseAnalytics firebaseAnalytics;
+    FirebaseAppLifecycleListener firebaseAppLifecycleListener;
+    FirebaseApp firebaseApp;
+    FirebaseOptions firebaseOptions;
 
     public Samla(Activity activity) {
         this.applicationActivity = activity;
+        funnelManager = new FunnelManager(applicationActivity);
     }
 
     public static Samla withActivity(Activity activity) {
         return new Samla(activity);
+    }
+
+    /**
+     * A userflow is a visual overview of an application's screens/navigation and structure
+     * @param enable: Enables/disables the creation of a userflow when building the application
+     */
+    public static void createUserFlow (Boolean enable) {
+           userFlowCreationEnabled = enable;
     }
 
     @Override
@@ -36,9 +57,14 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
         return applicationActivity;
     }
 
+    public FunnelManager getFunnelManager() {
+        return funnelManager;
+    }
+
     @OnLifecycleEvent(ON_CREATE)
     void onCreated(LifecycleOwner lifecycleOwner) {
         Log.i(TAG, "onCreated");
+        UserInterfaceHierarchy.setMenuListener(applicationActivity.findViewById(android.R.id.content));
     }
 
     @OnLifecycleEvent(ON_RESUME)
@@ -59,6 +85,11 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
         Log.i(TAG, "UI Hierarchy: " + hierarchy);
 
         UserInterfaceHierarchy.takeScreenShot(applicationActivity);
+
+        if (userFlowCreationEnabled) {
+            // Todo: Testing to send
+        }
+
     }
 
     @OnLifecycleEvent(ON_DESTROY)
