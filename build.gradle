@@ -2,20 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'com.google.gms.google-services'
 
-
-def getAPKPath = {
-    def apk = null
-    android.applicationVariants.all { variant ->
-        if ( (variant.name).equals("release") ) {
-            variant.outputs.each { output ->
-                apk = output.outputFile
-            }
-        }
-    }
-    println "Found output file: " + apk
-    return apk
-}
-
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
@@ -94,19 +80,3 @@ dependencies {
     implementation 'androidx.core:core:1.2.0'
     implementation 'com.google.firebase:firebase-analytics:17.2.2'
 }
-
-// --app: The path to the application binary file.
-def buildUserFlow = {
-    doLast {
-        def stdout = new ByteArrayOutputStream()
-        exec {
-            commandLine 'gcloud', 'firebase', 'test', 'android', 'run', '--app= ', "\"${getAPKPath()}\""
-            standardOutput = stdout
-        }
-        if(stdout.toString() != null)
-            return stdout.toString().trim()
-        else{ return null }
-    }
-}
-
-build.finalizedBy(buildUserFlow)
