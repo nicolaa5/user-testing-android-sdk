@@ -1,6 +1,12 @@
 package com.samla.sdk;
 
 import android.app.Activity;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import android.util.Log;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -99,6 +105,32 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
 
     @OnLifecycleEvent(ON_ANY)
     void onAny(LifecycleOwner source, Lifecycle.Event event) {
+
+    }
+
+    void test () {
+        applicationActivity.ist
+        FragmentManager manager = new FragmentManager() {
+            @Nullable
+            @Override
+            public Fragment findFragmentByTag(@Nullable String tag) {
+                return super.findFragmentByTag(tag);
+            }
+
+            @Override
+            public void addOnBackStackChangedListener(@NonNull OnBackStackChangedListener listener) {
+                super.addOnBackStackChangedListener(listener);
+            }
+
+            @Override
+            public void removeOnBackStackChangedListener(@NonNull OnBackStackChangedListener listener) {
+                super.removeOnBackStackChangedListener(listener);
+            }
+        };
+
+        manager.addOnBackStackChangedListener(this);
+        manager.findFragmentByTag("SimpleClassName");
+
 
     }
 }
