@@ -1,14 +1,14 @@
 package com.samla.sdk.analytics
 
+import android.app.Activity
 import android.view.View
+import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 
-class ViewManager(viewToManage: View) : AppCompatActivity(){
+class ViewManager(activity : Activity, viewToManage: View) {
 
-    var view : View = viewToManage;
-
-    fun windowListener() {
-        window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
+    init {
+        activity.window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
             // Note that system bars will only be "visible" if none of the
             // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
             if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
@@ -21,10 +21,13 @@ class ViewManager(viewToManage: View) : AppCompatActivity(){
                 // other navigational controls.
             }
         }
-        
-        view.addOnLayoutChangeListener { view, i, i2, i3, i4, i5, i6, i7, i8 ->
+
+        viewToManage.addOnLayoutChangeListener { view, i, i2, i3, i4, i5, i6, i7, i8 ->
 
         }
     }
 
+    fun destroy() {
+
+    }
 }

@@ -15,17 +15,26 @@ class ActivityManager (applicationActivity : Activity) {
     var activity : Activity = applicationActivity;
     var windowManager : WindowManager = activity.windowManager;
 
+    init {
+        getViews(activity.window.decorView);
+    }
+
+
     var fragList: MutableList<WeakReference<Fragment>> =
         ArrayList<WeakReference<Fragment>>()
 
     @Override
-    fun onAttachFragment(fragment: Fragment?) {
-        if (fragment == null)
-            return;
-
+    fun onAttachFragment(fragment: Fragment) {
         fragList.add(WeakReference(fragment))
     }
 
+    fun application () {
+        getViews(activity.window.decorView);
+    }
+
+    /**
+     * Gets all fragments within the activity
+     */
     fun getActiveFragments(): List<Fragment>? {
         val ret: ArrayList<Fragment> = ArrayList<Fragment>()
         for (ref in fragList) {
@@ -37,11 +46,6 @@ class ActivityManager (applicationActivity : Activity) {
             }
         }
         return ret
-    }
-
-    fun application () {
-        getViews(activity.window.decorView);
-
     }
 
     /**

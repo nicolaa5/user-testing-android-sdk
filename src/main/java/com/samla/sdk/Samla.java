@@ -22,7 +22,7 @@ import com.samla.sdk.userinterface.UserInterfaceHierarchy;
 
 import static androidx.lifecycle.Lifecycle.Event.*;
 
-public class Samla implements LifecycleObserver, SamlaBuilder {
+public class Samla implements LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener {
     private final static String TAG = Samla.class.getSimpleName();
 
     private Activity applicationActivity;
@@ -38,6 +38,7 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
     public Samla(Activity activity) {
         this.applicationActivity = activity;
         funnelManager = new FunnelManager(applicationActivity);
+        applicationActivity.addOnBackStackChangedListener(this);
     }
 
     public static Samla withActivity(Activity activity) {
@@ -109,7 +110,6 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
     }
 
     void test () {
-        applicationActivity.ist
         FragmentManager manager = new FragmentManager() {
             @Nullable
             @Override
@@ -127,10 +127,13 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
                 super.removeOnBackStackChangedListener(listener);
             }
         };
-
-        manager.addOnBackStackChangedListener(this);
         manager.findFragmentByTag("SimpleClassName");
 
 
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        Log.i(TAG, "onBackStackChanged");
     }
 }
