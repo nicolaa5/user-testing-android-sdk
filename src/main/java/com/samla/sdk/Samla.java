@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import android.util.Log;
+import android.view.View;
+
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -17,6 +19,8 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseAppLifecycleListener;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.samla.sdk.analytics.ActivityManager;
+import com.samla.sdk.analytics.ViewManager;
 import com.samla.sdk.analytics.funnel.FunnelManager;
 import com.samla.sdk.userinterface.UserInterfaceHierarchy;
 
@@ -28,6 +32,7 @@ public class Samla implements LifecycleObserver, SamlaBuilder, FragmentManager.O
     private Activity applicationActivity;
     private Lifecycle lifecycle;
     private FunnelManager funnelManager;
+    private ActivityManager activityManager;
     private static boolean userFlowCreationEnabled = true;
 
     FirebaseAnalytics firebaseAnalytics;
@@ -38,7 +43,8 @@ public class Samla implements LifecycleObserver, SamlaBuilder, FragmentManager.O
     public Samla(Activity activity) {
         this.applicationActivity = activity;
         funnelManager = new FunnelManager(applicationActivity);
-        applicationActivity.addOnBackStackChangedListener(this);
+        activityManager = new ActivityManager(applicationActivity);
+        //applicationActivity.addOnBackStackChangedListener(this);
     }
 
     public static Samla withActivity(Activity activity) {

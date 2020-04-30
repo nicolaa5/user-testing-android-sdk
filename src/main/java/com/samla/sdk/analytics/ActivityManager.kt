@@ -4,19 +4,32 @@ import android.app.Activity
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import java.lang.ref.WeakReference
 
 
-class ActivityManager (applicationActivity : Activity) {
+class ActivityManager (activity : Activity) {
     private val TAG = ActivityManager::class.java.simpleName
-
-    var activity : Activity = applicationActivity;
-    var windowManager : WindowManager = activity.windowManager;
+    var applicationActivity : Activity = activity;
 
     init {
-        getViews(activity.window.decorView);
+
+        //var windowManager : WindowManager = activity.windowManager;
+        //getViews(activity.window.decorView);
+
+        activity.window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
+            // Note that system bars will only be "visible" if none of the
+            // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
+            if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
+                // TODO: The system bars are visible. Make any desired
+                // adjustments to your UI, such as showing the action bar or
+                // other navigational controls.
+            } else {
+                // TODO: The system bars are NOT visible. Make any desired
+                // adjustments to your UI, such as hiding the action bar or
+                // other navigational controls.
+            }
+        }
     }
 
 
@@ -26,10 +39,6 @@ class ActivityManager (applicationActivity : Activity) {
     @Override
     fun onAttachFragment(fragment: Fragment) {
         fragList.add(WeakReference(fragment))
-    }
-
-    fun application () {
-        getViews(activity.window.decorView);
     }
 
     /**
