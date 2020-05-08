@@ -1,7 +1,15 @@
 package com.samla.sdk;
 
 import android.app.Activity;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import android.util.Log;
+import android.view.View;
+
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -11,17 +19,20 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseAppLifecycleListener;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.samla.sdk.analytics.ActivityManager;
+import com.samla.sdk.analytics.ViewManager;
 import com.samla.sdk.analytics.funnel.FunnelManager;
 import com.samla.sdk.userinterface.UserInterfaceHierarchy;
 
 import static androidx.lifecycle.Lifecycle.Event.*;
 
-public class Samla implements LifecycleObserver, SamlaBuilder {
+public class Samla implements LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener {
     private final static String TAG = Samla.class.getSimpleName();
 
     private Activity applicationActivity;
     private Lifecycle lifecycle;
     private FunnelManager funnelManager;
+    private ActivityManager activityManager;
     private static boolean userFlowCreationEnabled = true;
 
     FirebaseAnalytics firebaseAnalytics;
@@ -32,6 +43,8 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
     public Samla(Activity activity) {
         this.applicationActivity = activity;
         funnelManager = new FunnelManager(applicationActivity);
+        activityManager = new ActivityManager(applicationActivity);
+        //applicationActivity.addOnBackStackChangedListener(this);
     }
 
     public static Samla withActivity(Activity activity) {
@@ -100,5 +113,33 @@ public class Samla implements LifecycleObserver, SamlaBuilder {
     @OnLifecycleEvent(ON_ANY)
     void onAny(LifecycleOwner source, Lifecycle.Event event) {
 
+    }
+
+    void test () {
+        FragmentManager manager = new FragmentManager() {
+            @Nullable
+            @Override
+            public Fragment findFragmentByTag(@Nullable String tag) {
+                return super.findFragmentByTag(tag);
+            }
+
+            @Override
+            public void addOnBackStackChangedListener(@NonNull OnBackStackChangedListener listener) {
+                super.addOnBackStackChangedListener(listener);
+            }
+
+            @Override
+            public void removeOnBackStackChangedListener(@NonNull OnBackStackChangedListener listener) {
+                super.removeOnBackStackChangedListener(listener);
+            }
+        };
+        manager.findFragmentByTag("SimpleClassName");
+
+
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        Log.i(TAG, "onBackStackChanged");
     }
 }
