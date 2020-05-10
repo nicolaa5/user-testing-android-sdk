@@ -1,23 +1,24 @@
-package com.samla.sdk.analytics
+package com.samla.sdk.userinterface
 
-import android.app.Activity
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.samla.sdk.ISamla
 import java.lang.ref.WeakReference
 
 
-class ActivityManager (activity : Activity) {
+object ActivityManager {
     private val TAG = ActivityManager::class.java.simpleName
-    var applicationActivity : Activity = activity;
+
+    lateinit var ISamla: ISamla
+
+    fun setClientActivity(entry : ISamla) {
+        ISamla = entry;
+    }
 
     init {
-
-        //var windowManager : WindowManager = activity.windowManager;
-        //getViews(activity.window.decorView);
-
-        activity.window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
+        ISamla.getActivity().window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
             // Note that system bars will only be "visible" if none of the
             // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
             if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
@@ -31,7 +32,6 @@ class ActivityManager (activity : Activity) {
             }
         }
     }
-
 
     var fragList: MutableList<WeakReference<Fragment>> =
         ArrayList<WeakReference<Fragment>>()
