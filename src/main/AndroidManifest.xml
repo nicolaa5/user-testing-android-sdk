@@ -6,7 +6,7 @@
     <application>
         <provider
                 android:authorities="${applicationId}.samla"
-                android:name=".Samla"
+                android:name=".lifecycle.ContextHook"
                 android:exported="false" />
         <provider
                 android:authorities="${applicationId}.fileprovider"

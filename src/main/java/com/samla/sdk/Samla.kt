@@ -20,14 +20,16 @@ import com.google.firebase.FirebaseAppLifecycleListener
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.samla.sdk.storage.DataStorage
+import com.samla.sdk.userflow.Analytics
 import com.samla.sdk.userflow.funnel.FunnelManager
 import com.samla.sdk.userinterface.ActivityManager
 import com.samla.sdk.userinterface.UIHierarchy
 
-class Samla() : ContentProvider(),  LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener, ISamla {
+class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener, ISamla {
+    private val TAG = Samla::class.java.simpleName
 
-    lateinit var mContext : Context
-    lateinit var mActivity: Activity
+    val mContext : Context
+    val mActivity: Activity
     lateinit var mLifeCycle: Lifecycle;
 
     lateinit var firebaseAnalytics: FirebaseAnalytics;
@@ -37,41 +39,21 @@ class Samla() : ContentProvider(),  LifecycleObserver, SamlaBuilder, FragmentMan
 
 
     init {
+        mContext  = context
+        mActivity = context as Activity
+
+
         FunnelManager.setClientActivity(this);
         ActivityManager.setClientActivity(this);
         DataStorage.setClientActivity(this);
+        Analytics.setClientActivity(this);
     }
 
     override fun getActivity(): Activity {
         return mActivity
     }
 
-    /**
-     * onCreate -> ContextProvider
-     * When a ContentProvider is created, Android will call its onCreate method.
-     * This is where the SDK can get a hold of a Context,
-     * which it does by calling the getContext method. This Context is safe to hold on to indefinitely.
-     *
-     * This is also a place that can be used to set up things that need to be active throughout the app's lifetime,
-     * such as ActivityLifecycleCallbacks or a UncaughtExceptionHandler
-     * You might also initialize a dependency injection framework here.
-     *
-     * https://firebase.googleblog.com/2016/12/how-does-firebase-initialize-on-android.html
-     */
-    override fun onCreate(): Boolean {
-        mContext  = context!!
-        mActivity = context!! as Activity
 
-        var activities : Activity = mContext as Activity;
-
-        UIHierarchy.setMenuListener(
-            mActivity.findViewById(
-                R.id.content
-            )
-        )
-
-        return true;
-    }
 
     override fun withLifeCycle(lifeCycle: Lifecycle): SamlaBuilder {
         mLifeCycle = lifeCycle
@@ -101,8 +83,6 @@ class Samla() : ContentProvider(),  LifecycleObserver, SamlaBuilder, FragmentMan
         val hierarchy = UIHierarchy.logViewHierarchy(mActivity)
         Log.i(TAG, "UI Hierarchy: $hierarchy")
         UIHierarchy.getScreenshot(mActivity)
-        if (userFlowCreationEnabled) { // Todo: Testing to send
-        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -112,6 +92,14 @@ class Samla() : ContentProvider(),  LifecycleObserver, SamlaBuilder, FragmentMan
 
     @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
     fun onAny(source: LifecycleOwner?, event: Lifecycle.Event?) {
+    }
+
+    fun menuListener () {
+        UIHierarchy.setMenuListener(
+            mActivity.findViewById(
+                R.id.content
+            )
+        )
     }
 
     fun test() {
@@ -136,30 +124,12 @@ class Samla() : ContentProvider(),  LifecycleObserver, SamlaBuilder, FragmentMan
         Log.i(TAG, "onBackStackChanged")
     }
 
-    companion object {
-        private val TAG = Samla::class.java.simpleName
-        private var userFlowCreationEnabled = true
-        fun withActivity(activity: Activity): Samla {
-            return Samla()
-        }
+    /**
+     * A userflow is a visual overview of an application's screens/navigation and structure
+     * @param enable: Enables/disables the creation of a userflow when building the application
+     */
+    fun createUserFlow(enable: Boolean) {
 
-        /**
-         * A userflow is a visual overview of an application's screens/navigation and structure
-         * @param enable: Enables/disables the creation of a userflow when building the application
-         */
-        fun createUserFlow(enable: Boolean) {
-            userFlowCreationEnabled = enable
-        }
     }
 
-    /**
-     * We are misusing the ContextProvider class for it's ability to send the context without the user
-     * actually sending it to the SDK. This workaround requires these boilerplate methods to be implemented.
-     */
-    override fun query(p0: Uri, p1: Array<out String>?, p2: String?,p3: Array<out String>?, p4: String?): Cursor? {return null}
-    override fun query( uri: Uri, projection: Array<out String>?, queryArgs: Bundle?, cancellationSignal: CancellationSignal?): Cursor? {return null}
-    override fun insert(p0: Uri, p1: ContentValues?): Uri? { return null}
-    override fun update(p0: Uri, p1: ContentValues?, p2: String?, p3: Array<out String>?): Int {return -1;}
-    override fun delete(p0: Uri, p1: String?, p2: Array<out String>?): Int { return -1}
-    override fun getType(p0: Uri): String? {  return null}
 }

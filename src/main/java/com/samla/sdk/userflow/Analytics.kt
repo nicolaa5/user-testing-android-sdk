@@ -2,21 +2,19 @@ package com.samla.sdk.userflow
 
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.samla.sdk.ISamla
+import com.samla.sdk.userflow.funnel.FunnelManager
 
-class Analytics(private val applicationContext: Context) {
+object Analytics {
 
-    init{
-        Analytics.context = applicationContext;
+    lateinit var ISamla: ISamla
+
+    fun setClientActivity(entry : ISamla) {
+        ISamla = entry;
     }
 
-    companion object {
-        private lateinit var context: Context
-
-        @JvmStatic
-        val firebaseAnalytics: FirebaseAnalytics
-            get() {
-                return FirebaseAnalytics.getInstance(context)
-            }
+    fun getFirebaseAnalytics (): FirebaseAnalytics {
+        return FirebaseAnalytics.getInstance(ISamla.getActivity())
     }
 
 }

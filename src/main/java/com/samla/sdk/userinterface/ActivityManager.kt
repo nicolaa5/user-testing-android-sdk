@@ -17,7 +17,7 @@ object ActivityManager {
         ISamla = entry;
     }
 
-    init {
+    fun systemUIChanceListen () {
         ISamla.getActivity().window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
             // Note that system bars will only be "visible" if none of the
             // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.

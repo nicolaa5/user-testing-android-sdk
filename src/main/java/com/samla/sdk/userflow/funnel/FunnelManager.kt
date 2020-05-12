@@ -2,7 +2,7 @@ package com.samla.sdk.userflow.funnel
 
 import android.util.Log
 import com.samla.sdk.ISamla
-import com.samla.sdk.userflow.Analytics.Companion.firebaseAnalytics
+import com.samla.sdk.userflow.Analytics
 import com.samla.sdk.userinterface.ToastManager.makeToast
 import java.util.*
 
@@ -21,7 +21,7 @@ object FunnelManager {
         wayPoints.add(WayPoint(wayPoint))
         Log.i(TAG, "Waypoints: $wayPoints")
         makeToast(ISamla.getActivity(), "Reached Waypoint: $wayPoint")
-        firebaseAnalytics.setUserProperty(
+        Analytics.getFirebaseAnalytics().setUserProperty(
             "milestone",
             wayPoint.toString()
         )
