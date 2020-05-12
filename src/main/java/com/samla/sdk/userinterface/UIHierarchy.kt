@@ -21,8 +21,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
-object UserInterfaceHierarchy {
-    private val TAG = UserInterfaceHierarchy::class.java.simpleName
+object UIHierarchy {
+    private val TAG = UIHierarchy::class.java.simpleName
 
     /** Pint into log activity views hierarchy.  */
     fun logViewHierarchy(activity: Activity): String {

@@ -22,7 +22,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.samla.sdk.storage.DataStorage
 import com.samla.sdk.userflow.funnel.FunnelManager
 import com.samla.sdk.userinterface.ActivityManager
-import com.samla.sdk.userinterface.UserInterfaceHierarchy
+import com.samla.sdk.userinterface.UIHierarchy
 
 class Samla() : ContentProvider(),  LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener, ISamla {
 
@@ -64,7 +64,7 @@ class Samla() : ContentProvider(),  LifecycleObserver, SamlaBuilder, FragmentMan
 
         var activities : Activity = mContext as Activity;
 
-        UserInterfaceHierarchy.setMenuListener(
+        UIHierarchy.setMenuListener(
             mActivity.findViewById(
                 R.id.content
             )
@@ -98,9 +98,9 @@ class Samla() : ContentProvider(),  LifecycleObserver, SamlaBuilder, FragmentMan
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onStop() {
         Log.i(TAG, "onStop")
-        val hierarchy = UserInterfaceHierarchy.logViewHierarchy(mActivity)
+        val hierarchy = UIHierarchy.logViewHierarchy(mActivity)
         Log.i(TAG, "UI Hierarchy: $hierarchy")
-        UserInterfaceHierarchy.getScreenshot(mActivity)
+        UIHierarchy.getScreenshot(mActivity)
         if (userFlowCreationEnabled) { // Todo: Testing to send
         }
     }
