@@ -1,4 +1,4 @@
-package com.samla.sdk.analytics
+package com.samla.sdk.userinterface
 
 import android.content.Context
 

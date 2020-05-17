@@ -1,9 +1,6 @@
-package com.samla.sdk.analytics
+package com.samla.sdk.userinterface
 
-import android.app.Activity
 import android.view.View
-import android.view.Window
-import androidx.appcompat.app.AppCompatActivity
 
 class ViewManager(viewToManage: View) {
 
