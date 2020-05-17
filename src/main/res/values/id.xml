@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="screen" type="id" format="integer"/>
+    <item name="action" type="id" format="integer"/>
+    <item name="source" type="id" format="integer"/>
+    <item name="destination" type="id" format="integer"/>
+</resources>
