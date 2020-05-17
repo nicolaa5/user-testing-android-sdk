@@ -1,13 +1,7 @@
 package com.samla.sdk
 
 import android.app.Activity
-import android.content.ContentProvider
-import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
-import android.net.Uri
-import android.os.Bundle
-import android.os.CancellationSignal
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -24,6 +18,7 @@ import com.samla.sdk.userflow.Analytics
 import com.samla.sdk.userflow.funnel.FunnelManager
 import com.samla.sdk.userinterface.ActivityManager
 import com.samla.sdk.userinterface.UIHierarchy
+
 
 class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener, ISamla {
     private val TAG = Samla::class.java.simpleName
@@ -42,7 +37,6 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
         mContext  = context
         mActivity = context as Activity
 
-
         FunnelManager.setClientActivity(this);
         ActivityManager.setClientActivity(this);
         DataStorage.setClientActivity(this);
@@ -52,8 +46,6 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
     override fun getActivity(): Activity {
         return mActivity
     }
-
-
 
     override fun withLifeCycle(lifeCycle: Lifecycle): SamlaBuilder {
         mLifeCycle = lifeCycle
