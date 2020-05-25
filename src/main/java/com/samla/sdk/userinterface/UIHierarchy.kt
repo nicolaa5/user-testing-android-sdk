@@ -27,7 +27,7 @@ object UIHierarchy {
     /** Pint into log activity views hierarchy.  */
     fun logViewHierarchy(activity: Activity): String {
         return logViewHierarchy(
-            activity.findViewById<View>(
+            activity.findViewById<ViewGroup>(
                 R.id.content
             )
         )
@@ -40,7 +40,7 @@ object UIHierarchy {
     }
 
     /** Print into log view hierarchy.  */
-    fun logViewHierarchy(root: View): String {
+    fun logViewHierarchy(root: ViewGroup): String {
         val output = StringBuilder(8192).append("\n")
         val r = root.resources
 

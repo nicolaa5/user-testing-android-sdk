@@ -3,6 +3,8 @@ package com.samla.sdk
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -17,6 +19,7 @@ import com.samla.sdk.storage.DataStorage
 import com.samla.sdk.userflow.Analytics
 import com.samla.sdk.userflow.funnel.FunnelManager
 import com.samla.sdk.userinterface.ActivityManager
+import com.samla.sdk.userinterface.UIAnalyzer
 import com.samla.sdk.userinterface.UIHierarchy
 
 
@@ -40,7 +43,19 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
         FunnelManager.setClientActivity(this);
         ActivityManager.setClientActivity(this);
         DataStorage.setClientActivity(this);
+
         Analytics.setClientActivity(this);
+
+        //Get the UI hierarchy
+        Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(mActivity))
+
+        //Set Listeners to all interactable elements
+        UIAnalyzer.buildUserFlow(UIHierarchy.getViewHierarchy(mActivity.findViewById<View>(android.R.id.content)))
+
+        //Set UI hierarchy change listener
+        UIAnalyzer.setUIHierarchyChangeListener (mActivity.findViewById<ViewGroup>(android.R.id.content)) {view ->
+            Log.i(TAG, "setUIHierarchyChangeListener: " + UIHierarchy.logViewHierarchy(mActivity))
+        }
     }
 
     override fun getActivity(): Activity {
