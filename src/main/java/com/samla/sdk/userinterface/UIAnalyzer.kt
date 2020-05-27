@@ -6,7 +6,8 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ListView
+import android.widget.ImageButton
+import android.widget.ImageView
 import com.samla.sdk.ISamla
 import com.samla.sdk.R
 import com.samla.sdk.database.DatabaseFactory
@@ -74,75 +75,53 @@ object UIAnalyzer {
     }
 
     fun setUIHierarchyChangeListener (viewGroup : ViewGroup, callback :(View) -> Unit) {
-        viewGroup.setOnHierarchyChangeListener(object : ViewGroup.OnHierarchyChangeListener {
-            override fun onChildViewRemoved(parent: View, child: View) {
-                callback.invoke(child)
-            }
 
-            override fun onChildViewAdded(parent: View, child: View) {
-                callback.invoke(child)
-            }
-
-        })
-        viewGroup.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
-            override fun onLayoutChange(
-                view: View,
-                p1: Int,
-                p2: Int,
-                p3: Int,
-                p4: Int,
-                p5: Int,
-                p6: Int,
-                p7: Int,
-                p8: Int
-            ) {
-                callback.invoke(view)
-            }
-
-        })
     }
 
     fun setInteractableElementListeners (hierarchy: Stack<Pair<String, View>> ) {
-        val buttonList : MutableList<Button> = mutableListOf()
-        val menuList : MutableList<Menu> = mutableListOf()
-        val listList : MutableList<ListView> = mutableListOf()
-
         while (!hierarchy.empty()) {
             val pair = hierarchy.pop()
             val view = pair.second
 
-            view.setOnClickListener { Log.i(TAG, "View: " + view.javaClass.simpleName) }
-
-            if (view is ViewGroup) {
-                val vg = view
-                for (i in vg.childCount - 1 downTo 0) {
-                    hierarchy.push(
-                        Pair.create(
-                            pair.first.toString(),
-                            vg.getChildAt(i)
-                        )
-                    )
+            view.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
+                override fun onLayoutChange( view: View, p1: Int, p2: Int,p3: Int,p4: Int, p5: Int, p6: Int,p7: Int,p8: Int ) {
+                    Log.i(TAG, "onLayoutChange: " + view.javaClass.simpleName)
                 }
-            }
-        }
 
-        for (pair :Pair<String, View> in hierarchy) {
-            val view : View = pair.second;
+            })
 
             when (view) {
-                is Button -> {
-                    buttonList.add(view)
+                is ViewGroup -> {
+                    val vg = view
+                    for (i in vg.childCount - 1 downTo 0) {
+                        hierarchy.push(
+                            Pair.create(
+                                pair.first.toString(),
+                                vg.getChildAt(i)
+                            )
+                        )
+                    }
                 }
-                is Menu -> menuList.add(view)
-                is ListView -> listList.add(view)
-                else -> {
-
+                is Button -> {
+                    view.setOnClickListener {
+                        Log.i(TAG, "Button: " + view.javaClass.simpleName)
+                        Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(view))
+                    }
+                }
+                is ImageButton-> {
+                    view.setOnClickListener {
+                        Log.i(TAG, "ImageButton: " + view.javaClass.simpleName)
+                        Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(view))
+                    }
+                }
+                is Menu -> {
+                    view.setOnClickListener {
+                        Log.i(TAG, "Menu: " + view.javaClass.simpleName)
+                        Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(view))
+                    }
                 }
             }
         }
-//        getUserflowBuildVersionFromServer("apiKey"){ userFlowBuild ->
-//            println()
-//        }
     }
 
 
