@@ -24,15 +24,6 @@ import java.util.*
 object UIHierarchy {
     private val TAG = UIHierarchy::class.java.simpleName
 
-    /** Pint into log activity views hierarchy.  */
-    fun logViewHierarchy(activity: Activity): String {
-        return logViewHierarchy(
-            activity.findViewById<ViewGroup>(
-                R.id.content
-            )
-        )
-    }
-
     fun getViewHierarchy(root: View): Stack<Pair<String, View>> {
         val stack = Stack<Pair<String, View>>()
         stack.push(Pair.create("", root))
@@ -40,7 +31,7 @@ object UIHierarchy {
     }
 
     /** Print into log view hierarchy.  */
-    fun logViewHierarchy(root: ViewGroup): String {
+    fun logViewHierarchy(root: View): String {
         val output = StringBuilder(8192).append("\n")
         val r = root.resources
 

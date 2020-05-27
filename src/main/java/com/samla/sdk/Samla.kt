@@ -46,15 +46,18 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
 
         Analytics.setClientActivity(this);
 
-        //Get the UI hierarchy
-        Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(mActivity))
+        //Await the moment the UI is rendered
+        mActivity.window.decorView.rootView.viewTreeObserver.addOnGlobalLayoutListener {
+            //Get the UI hierarchy
+            Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(mActivity.window.decorView.rootView))
 
-        //Set Listeners to all interactable elements
-        UIAnalyzer.buildUserFlow(UIHierarchy.getViewHierarchy(mActivity.findViewById<View>(android.R.id.content)))
+            //Set Listeners to all interactable elements
+            UIAnalyzer.setInteractableElementListeners(UIHierarchy.getViewHierarchy(mActivity.window.decorView.rootView))
 
-        //Set UI hierarchy change listener
-        UIAnalyzer.setUIHierarchyChangeListener (mActivity.findViewById<ViewGroup>(android.R.id.content)) {view ->
-            Log.i(TAG, "setUIHierarchyChangeListener: " + UIHierarchy.logViewHierarchy(mActivity))
+            //Set UI hierarchy change listener
+            UIAnalyzer.setUIHierarchyChangeListener (mActivity.window.decorView.rootView as ViewGroup) { view ->
+                Log.i(TAG, "setUIHierarchyChangeListener: " + UIHierarchy.logViewHierarchy(view))
+            }
         }
     }
 
@@ -87,8 +90,8 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onStop() {
         Log.i(TAG, "onStop")
-        val hierarchy = UIHierarchy.logViewHierarchy(mActivity)
-        Log.i(TAG, "UI Hierarchy: $hierarchy")
+        val hierarchy = UIHierarchy.logViewHierarchy(mActivity.window.decorView.rootView)
+        Log.i(TAG, "UI Hierarchy onStop: $hierarchy")
         UIHierarchy.getScreenshot(mActivity)
     }
 
@@ -103,9 +106,7 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
 
     fun menuListener () {
         UIHierarchy.setMenuListener(
-            mActivity.findViewById(
-                R.id.content
-            )
+            mActivity.window.decorView.rootView
         )
     }
 

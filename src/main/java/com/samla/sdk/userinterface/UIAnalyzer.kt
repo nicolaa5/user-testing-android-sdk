@@ -102,7 +102,7 @@ object UIAnalyzer {
         })
     }
 
-    fun buildUserFlow (hierarchy: Stack<Pair<String, View>> ) {
+    fun setInteractableElementListeners (hierarchy: Stack<Pair<String, View>> ) {
         val buttonList : MutableList<Button> = mutableListOf()
         val menuList : MutableList<Menu> = mutableListOf()
         val listList : MutableList<ListView> = mutableListOf()
@@ -111,7 +111,7 @@ object UIAnalyzer {
             val pair = hierarchy.pop()
             val view = pair.second
 
-            view.setOnClickListener { Log.i(TAG, "View: " + view.id) }
+            view.setOnClickListener { Log.i(TAG, "View: " + view.javaClass.simpleName) }
 
             if (view is ViewGroup) {
                 val vg = view
