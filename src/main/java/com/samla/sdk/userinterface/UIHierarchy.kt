@@ -58,7 +58,7 @@ object UIHierarchy {
             //Log line
             val isLastOnLevel : Boolean = stack.empty() || pair.first != stack.peek().first
             val logDisplay : String = "" + pair.first + if (isLastOnLevel) "└── " else "├── "
-            val line : String = logDisplay + className + "tag: " + tags + location + dimensions + color + " id=" + v.id + resolveIdToName(r,v)
+            val line : String = logDisplay + className + tags + location + dimensions + color + " id=" + v.id + resolveIdToName(r,v)
 
             output.append(line).append("\n")
             if (v is ViewGroup) {
