@@ -2,9 +2,10 @@ package com.samla.sdk
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.util.Log
-import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -39,11 +40,9 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
     init {
         mContext  = context
         mActivity = context as Activity
-
         FunnelManager.setClientActivity(this);
         ActivityManager.setClientActivity(this);
         DataStorage.setClientActivity(this);
-
         Analytics.setClientActivity(this);
 
         //Await the moment the UI is rendered
@@ -51,42 +50,35 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
             //Get the UI hierarchy
             Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(mActivity.window.decorView.rootView))
 
-            //Set Listeners to all interactable elements
-            //UIAnalyzer.setInteractableElementListeners(UIHierarchy.getViewHierarchy(mActivity.window.decorView.rootView))
 
             //Set UI hierarchy change listener
-            UIAnalyzer.setUIHierarchyChangeListener (mActivity.window.decorView.rootView as ViewGroup) { view ->
+            UIAnalyzer.setViewLayoutChangedListener (mActivity.window.decorView.rootView as ViewGroup, true) { view ->
+                Log.i(TAG, "LayoutChanged: " + UIHierarchy.logViewHierarchy(mActivity.window.decorView.rootView))
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    UIHierarchy.takeScreenshot(mActivity.window.decorView.rootView, mActivity) { bitmap ->
+                        UIHierarchy.storeScreenshot(bitmap, mActivity, 100)
+                    }
+                }
+                else {
+                    UIHierarchy.takeScreenshot(mActivity)
+                }
+            }
+
+            UIAnalyzer.setViewChildChangedListener(mActivity.window.decorView.rootView as ViewGroup) { view ->
                 Log.i(TAG, "uiHierarchyChangedListener")
+
+                UIAnalyzer.setInteractableElementListeners(view, false) {view ->
+
+                }
             }
 
-            mActivity.window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
-                Log.i(TAG, "onSystemUiVisibilityChanged")
-
+            //Set Listeners to all interactable elements
+            UIAnalyzer.setInteractableElementListeners(mActivity.window.decorView.rootView, true) { view ->
 
             }
+
         }
-
-
-        val viewGroup : ViewGroup = mActivity.window.decorView.rootView as ViewGroup
-        viewGroup.setOnHierarchyChangeListener(object : ViewGroup.OnHierarchyChangeListener {
-            override fun onChildViewRemoved(parent: View, child: View) {
-                Log.i(TAG, "onChildViewRemoved")
-            }
-
-            override fun onChildViewAdded(parent: View, child: View) {
-                Log.i(TAG, "onChildViewAdded")
-            }
-
-        })
-
-        UIAnalyzer.setInteractableElementListeners(UIHierarchy.getViewHierarchy(mActivity.window.decorView.rootView))
-
-//        mActivity.window.decorView.rootView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
-//            override fun onLayoutChange( view: View, p1: Int, p2: Int,p3: Int,p4: Int, p5: Int, p6: Int,p7: Int,p8: Int ) {
-//                Log.i(TAG, "onLayoutChange")
-//            }
-//
-//        })
     }
 
     override fun getActivity(): Activity {
@@ -120,7 +112,7 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
         Log.i(TAG, "onStop")
         val hierarchy = UIHierarchy.logViewHierarchy(mActivity.window.decorView.rootView)
         Log.i(TAG, "UI Hierarchy onStop: $hierarchy")
-        UIHierarchy.getScreenshot(mActivity)
+        UIHierarchy.takeScreenshot(mActivity)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

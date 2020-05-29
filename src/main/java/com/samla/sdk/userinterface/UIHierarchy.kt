@@ -24,12 +24,6 @@ import java.util.*
 object UIHierarchy {
     private val TAG = UIHierarchy::class.java.simpleName
 
-    fun getViewHierarchy(root: View): Stack<Pair<String, View>> {
-        val stack = Stack<Pair<String, View>>()
-        stack.push(Pair.create("", root))
-        return stack
-    }
-
     /** Print into log view hierarchy.  */
     fun logViewHierarchy(root: View): String {
         val output = StringBuilder(8192).append("\n")
@@ -100,16 +94,16 @@ object UIHierarchy {
         }
     }
 
-    fun getScreenshot(activity: Activity): Bitmap {
+    fun takeScreenshot(activity: Activity): Bitmap {
         return Bitmap.createBitmap(activity.window.decorView.width, activity.window.decorView.height, Bitmap.Config.ARGB_8888)
     }
 
-    fun getScreenshot(view: View): Bitmap {
+    fun takeScreenshot(view: View): Bitmap {
         return Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getScreenshot(view: View, activity: Activity, callback: (Bitmap) -> Unit) {
+    fun takeScreenshot(view: View, activity: Activity, callback: (Bitmap) -> Unit) {
         activity.window?.let { window ->
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             val locationOfViewInWindow = IntArray(2)

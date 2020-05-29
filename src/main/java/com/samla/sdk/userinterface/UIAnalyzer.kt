@@ -2,12 +2,8 @@ package com.samla.sdk.userinterface
 
 import android.util.Log
 import android.util.Pair
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.ImageView
 import com.samla.sdk.ISamla
 import com.samla.sdk.R
 import com.samla.sdk.database.DatabaseFactory
@@ -55,7 +51,7 @@ object UIAnalyzer {
         view.setTag(R.id.screen, screen)
 
         view.viewTreeObserver.addOnGlobalLayoutListener {
-            val screenshot = UIHierarchy.getScreenshot(view)
+            val screenshot = UIHierarchy.takeScreenshot(view)
             val storedScreenshot = UIHierarchy.storeScreenshot(screenshot, ISamla.getActivity(), 100)
             UIHierarchy.openScreenshot(ISamla.getActivity(), storedScreenshot)
         }
@@ -74,50 +70,103 @@ object UIAnalyzer {
         }
     }
 
-    fun setUIHierarchyChangeListener (viewGroup : ViewGroup, callback :(View) -> Unit) {
 
+
+    fun setViewLayoutChangedListener (view: View, recurse : Boolean, callback :(View) -> Unit) {
+        if (recurse)
+            depthFirstSearch (view) {foundView ->
+                foundView.addOnLayoutChangeListener { view, p1, p2, p3, p4, p5, p6, p7, p8 ->
+                    Log.i(TAG, "onLayoutChange: " + view.javaClass.simpleName)
+                    callback.invoke(view)
+                }
+            }
+        else
+            view.addOnLayoutChangeListener { view, p1, p2, p3, p4, p5, p6, p7, p8 ->
+                Log.i(TAG, "onLayoutChange: " + view.javaClass.simpleName)
+                callback.invoke(view)
+            }
     }
 
-    fun setInteractableElementListeners (hierarchy: Stack<Pair<String, View>> ) {
+    fun setViewChildChangedListener ( viewGroup : ViewGroup, callback :(View) -> Unit) {
+        viewGroup.setOnHierarchyChangeListener(object : ViewGroup.OnHierarchyChangeListener {
+
+            override fun onChildViewRemoved(parent: View, child: View) {
+                Log.i(TAG, "onChildViewRemoved")
+            }
+
+            override fun onChildViewAdded(parent: View, child: View) {
+                Log.i(TAG, "onChildViewAdded")
+                callback.invoke(child)
+            }
+        })
+    }
+
+    fun setInteractableElementListeners (view: View, recurse : Boolean,  callback :(View) -> Unit ) {
+        if (recurse)
+            depthFirstSearch(view) { foundView ->
+                Log.i(TAG, "view: " + view.javaClass.simpleName)
+
+                if (foundView.isClickable) {
+                    foundView.setOnClickListener {
+                        callback.invoke(foundView)
+                    }
+                }
+            }
+        else
+            if (view.isClickable) {
+                view.setOnClickListener {
+                    callback.invoke(view)
+                }
+            }
+    }
+
+    fun setViewVisibilityListener (view: View, recurse : Boolean, callback :(View) -> Unit ) {
+        if (recurse)
+            depthFirstSearch (view) {foundView ->
+                //Based on Visibility.GONE, Visibility.VISIBLE, Visibility.INVISIBLE
+                foundView.setOnSystemUiVisibilityChangeListener { visibility ->
+                    when (visibility) {
+                        View.VISIBLE ->
+                            Log.i(TAG, "onSystemUiVisibilityChanged: " + foundView + " VISIBLE" )
+                        View.INVISIBLE ->
+                            Log.i(TAG, "onSystemUiVisibilityChanged: " + foundView + " INVISIBLE" )
+                        View.GONE ->
+                            Log.i(TAG, "onSystemUiVisibilityChanged: " + foundView + " GONE" )
+                    }
+                }
+            }
+        else
+            view.setOnSystemUiVisibilityChangeListener { visibility ->
+                when (visibility) {
+                    View.VISIBLE ->
+                        Log.i(TAG, "onSystemUiVisibilityChanged: " + view + " VISIBLE" )
+                    View.INVISIBLE ->
+                        Log.i(TAG, "onSystemUiVisibilityChanged: " + view + " INVISIBLE" )
+                    View.GONE ->
+                        Log.i(TAG, "onSystemUiVisibilityChanged: " + view + " GONE" )
+                }
+            }
+    }
+
+    fun depthFirstSearch (view : View, callback :(View) -> Unit ) {
+        val hierarchy = Stack<Pair<String, View>>()
+        hierarchy.push(Pair.create("", view))
+
         while (!hierarchy.empty()) {
             val pair = hierarchy.pop()
             val view = pair.second
-
-            view.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
-                override fun onLayoutChange( view: View, p1: Int, p2: Int,p3: Int,p4: Int, p5: Int, p6: Int,p7: Int,p8: Int ) {
-                    Log.i(TAG, "onLayoutChange: " + view.javaClass.simpleName)
-                }
-
-            })
+            callback.invoke(view)
 
             when (view) {
                 is ViewGroup -> {
                     val vg = view
-                    for (i in vg.childCount - 1 downTo 0) {
+                    for (i in (vg.childCount - 1) downTo 0) {
                         hierarchy.push(
                             Pair.create(
                                 pair.first.toString(),
                                 vg.getChildAt(i)
                             )
                         )
-                    }
-                }
-                is Button -> {
-                    view.setOnClickListener {
-                        Log.i(TAG, "Button: " + view.javaClass.simpleName)
-                        Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(view))
-                    }
-                }
-                is ImageButton-> {
-                    view.setOnClickListener {
-                        Log.i(TAG, "ImageButton: " + view.javaClass.simpleName)
-                        Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(view))
-                    }
-                }
-                is Menu -> {
-                    view.setOnClickListener {
-                        Log.i(TAG, "Menu: " + view.javaClass.simpleName)
-                        Log.i(TAG, "UI Hierarchy: " + UIHierarchy.logViewHierarchy(view))
                     }
                 }
             }
