@@ -2,8 +2,10 @@ package com.samla.sdk
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Build
 import android.util.Log
+import android.view.PixelCopy
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.view.doOnLayout
@@ -23,6 +25,8 @@ import com.samla.sdk.userflow.funnel.FunnelManager
 import com.samla.sdk.userinterface.ActivityManager
 import com.samla.sdk.userinterface.UIAnalyzer
 import com.samla.sdk.userinterface.UIHierarchy
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 
 class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener, ISamla {
@@ -56,8 +60,17 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
                 Log.i(TAG, "LayoutChanged: " + UIHierarchy.logViewHierarchy(mActivity.window.decorView.rootView))
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    UIHierarchy.takeScreenshot(mActivity.window.decorView.rootView, mActivity) { bitmap ->
-                        UIHierarchy.storeScreenshot(bitmap, mActivity, 100)
+                    UIHierarchy.takeScreenshot(mActivity.window.decorView.rootView, mActivity) { bitmap : Bitmap, result : Int  ->
+                        when (result) {
+                            PixelCopy.SUCCESS -> {
+                                UIHierarchy.storeScreenshot(bitmap, mActivity, 100)
+                            }
+                            else -> {
+                                Log.i(TAG, "PixelCopy Error: " + result)
+                                val screen : Bitmap = UIHierarchy.takeScreenshot(mActivity.window.decorView.rootView)
+                                UIHierarchy.storeScreenshot(screen, mActivity, 100)
+                            }
+                        }
                     }
                 }
                 else {

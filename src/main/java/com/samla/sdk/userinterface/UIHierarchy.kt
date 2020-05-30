@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
+import kotlinx.coroutines.delay
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -103,22 +104,21 @@ object UIHierarchy {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun takeScreenshot(view: View, activity: Activity, callback: (Bitmap) -> Unit) {
-        activity.window?.let { window ->
+    fun takeScreenshot(view: View, activity: Activity, callback: (Bitmap, Int) -> Unit) {
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             val locationOfViewInWindow = IntArray(2)
             view.getLocationInWindow(locationOfViewInWindow)
             try {
-                PixelCopy.request(window, Rect(locationOfViewInWindow[0], locationOfViewInWindow[1], locationOfViewInWindow[0] + view.width, locationOfViewInWindow[1] + view.height), bitmap, { copyResult ->
-                    if (copyResult == PixelCopy.SUCCESS) {
-                        callback(bitmap)
-                    }
-                }, Handler())
+                activity.window?.let { window ->
+                    Log.i(TAG, "window: " + window)
+                    PixelCopy.request(window, Rect(locationOfViewInWindow[0], locationOfViewInWindow[1], locationOfViewInWindow[0] + view.width, locationOfViewInWindow[1] + view.height), bitmap, { copyResult ->
+                        callback(bitmap, copyResult)
+                    }, Handler())
+                }
             } catch (e: IllegalArgumentException) {
                 // PixelCopy may throw IllegalArgumentException, make sure to handle it
                 e.printStackTrace()
             }
-        }
     }
 
     fun storeScreenshot (bitmap: Bitmap, activity: Activity, compressQuality : Int) : File {
