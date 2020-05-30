@@ -81,14 +81,14 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
             UIAnalyzer.setViewChildChangedListener(mActivity.window.decorView.rootView as ViewGroup) { view ->
                 Log.i(TAG, "uiHierarchyChangedListener")
 
-                UIAnalyzer.setInteractableElementListeners(view, false) {view ->
-
+                UIAnalyzer.setViewClickListeners(view, false) { view ->
+                    Log.i(TAG, "ClickedView (new): " + view.javaClass.simpleName)
                 }
             }
 
             //Set Listeners to all interactable elements
-            UIAnalyzer.setInteractableElementListeners(mActivity.window.decorView.rootView, true) { view ->
-
+            UIAnalyzer.setViewClickListeners(mActivity.window.decorView.rootView, true) { view ->
+                Log.i(TAG, "ClickedView: " + view.javaClass.simpleName)
             }
 
         }

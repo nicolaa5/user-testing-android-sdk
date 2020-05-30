@@ -101,21 +101,38 @@ object UIAnalyzer {
         })
     }
 
-    fun setInteractableElementListeners (view: View, recurse : Boolean,  callback :(View) -> Unit ) {
+    /**
+     * Sets listeners to all views that can be clicked. OnClick listeners are not used
+     * since there can only be one onClick listener per View which blocks both the client
+     * and the library from setting listeners. Therefore instead of setting onClick listeners
+     * we set onTouch listeners
+     *
+     * @note  The return value of setOnTouchListener() needs to be false in order for the event
+     * to continue propogating along the UI tree
+     */
+    fun setViewClickListeners (view: View, recurse : Boolean, callback :(View) -> Unit ) {
         if (recurse)
             depthFirstSearch(view) { foundView ->
-                Log.i(TAG, "view: " + view.javaClass.simpleName)
-
                 if (foundView.isClickable) {
-                    foundView.setOnClickListener {
-                        callback.invoke(foundView)
+                    foundView.setOnTouchListener { view, motionEvent ->
+                        when (motionEvent.action) {
+                            MotionEvent.ACTION_UP -> {
+                                callback.invoke(foundView)
+                            }
+                        }
+                        return@setOnTouchListener false
                     }
                 }
             }
         else
             if (view.isClickable) {
-                view.setOnClickListener {
-                    callback.invoke(view)
+                view.setOnTouchListener { view, motionEvent ->
+                    when (motionEvent.action) {
+                        MotionEvent.ACTION_UP -> {
+                            callback.invoke(view)
+                        }
+                    }
+                    return@setOnTouchListener false
                 }
             }
     }
