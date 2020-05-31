@@ -7,7 +7,6 @@ import android.os.Build
 import android.util.Log
 import android.view.PixelCopy
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -25,8 +24,6 @@ import com.samla.sdk.userflow.funnel.FunnelManager
 import com.samla.sdk.userinterface.ActivityManager
 import com.samla.sdk.userinterface.UIAnalyzer
 import com.samla.sdk.userinterface.UIHierarchy
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 
 
 class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener, ISamla {
@@ -74,7 +71,8 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
                     }
                 }
                 else {
-                    UIHierarchy.takeScreenshot(mActivity)
+                    val screen : Bitmap = UIHierarchy.takeScreenshot(mActivity.window.decorView.rootView)
+                    UIHierarchy.storeScreenshot(screen, mActivity, 100)
                 }
             }
 

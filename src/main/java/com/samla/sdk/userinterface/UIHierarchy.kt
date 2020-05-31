@@ -5,15 +5,14 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Handler
 import android.util.Log
 import android.util.Pair
-import android.view.PixelCopy
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
@@ -99,8 +98,14 @@ object UIHierarchy {
         return Bitmap.createBitmap(activity.window.decorView.width, activity.window.decorView.height, Bitmap.Config.ARGB_8888)
     }
 
+    /**
+     * Copy View to Canvas and return bitMap
+     */
     fun takeScreenshot(view: View): Bitmap {
-        return Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        view.draw(canvas)
+        return bitmap
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
