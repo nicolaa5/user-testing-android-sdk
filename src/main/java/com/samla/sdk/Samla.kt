@@ -56,7 +56,7 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
 
 
             //Set UI hierarchy change listener
-            UIAnalyzer.setViewLayoutChangedListener (mActivity.window.decorView.rootView as ViewGroup, true) { view ->
+            UIAnalyzer.setViewLayoutChangedListener (mActivity.window.decorView.rootView as ViewGroup, true, true) { view ->
                 Log.i(TAG, "LayoutChanged: " + UIHierarchy.logViewHierarchy(mActivity.window.decorView.rootView))
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

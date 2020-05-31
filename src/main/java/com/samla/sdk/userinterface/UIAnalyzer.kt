@@ -2,12 +2,14 @@ package com.samla.sdk.userinterface
 
 import android.util.Log
 import android.util.Pair
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import com.samla.sdk.ISamla
 import com.samla.sdk.R
 import com.samla.sdk.database.DatabaseFactory
 import com.samla.sdk.storage.DataStorage
+import kotlinx.coroutines.*
 import retrofit2.http.GET
 import java.util.*
 
@@ -70,16 +72,45 @@ object UIAnalyzer {
         }
     }
 
+    fun delay (milliseconds : Int, callback : () -> Unit) {
+        GlobalScope.async {
+            delay(milliseconds.toLong())
+            callback.invoke()
+        }
+    }
 
+    /**
+     * Set listeners to view to track whether the layout parameters of the view have changed
+     * This is useful for detecting small changes in the UI
+     *
+     * @param view: The view to set a layout listener to
+     * @param recurse: Set listeners to the child views of the supplied view
+     * @param debounce: Prevent successive callbacks of the same changes in a tree by using a debounce
+     */
+    fun setViewLayoutChangedListener (view: View, recurse : Boolean, debounce : Boolean, callback :(View) -> Unit) {
+        if (recurse) {
+            var callbacksBlocked = false
 
-    fun setViewLayoutChangedListener (view: View, recurse : Boolean, callback :(View) -> Unit) {
-        if (recurse)
             depthFirstSearch (view) {foundView ->
                 foundView.addOnLayoutChangeListener { view, p1, p2, p3, p4, p5, p6, p7, p8 ->
-                    Log.i(TAG, "onLayoutChange: " + view.javaClass.simpleName)
-                    callback.invoke(view)
+                    if (debounce) {
+                        if (!callbacksBlocked) {
+                            callback.invoke(view)
+
+                            callbacksBlocked = true
+                            delay(20) {
+                                callbacksBlocked = false
+                            }
+                        }
+                    }
+                    else {
+                        Log.i(TAG, "onLayoutChange: " + view.javaClass.simpleName)
+                        callback.invoke(view)
+                    }
                 }
             }
+        }
+
         else
             view.addOnLayoutChangeListener { view, p1, p2, p3, p4, p5, p6, p7, p8 ->
                 Log.i(TAG, "onLayoutChange: " + view.javaClass.simpleName)
