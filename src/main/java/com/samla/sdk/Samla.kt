@@ -1,11 +1,15 @@
 package com.samla.sdk
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Build
 import android.util.Log
 import android.view.PixelCopy
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
@@ -24,27 +28,44 @@ import com.samla.sdk.userflow.funnel.FunnelManager
 import com.samla.sdk.userinterface.ActivityManager
 import com.samla.sdk.userinterface.UIAnalyzer
 import com.samla.sdk.userinterface.UIHierarchy
+import eu.bolt.screenshotty.Screenshot
+import eu.bolt.screenshotty.ScreenshotManager
+import eu.bolt.screenshotty.ScreenshotManagerBuilder
+import eu.bolt.screenshotty.util.ScreenshotFileSaver
+import java.io.File
 
 
-class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener, ISamla {
+object Samla  : LifecycleObserver, SamlaBuilder, FragmentManager.OnBackStackChangedListener, ISamla {
     private val TAG = Samla::class.java.simpleName
 
-    val mContext : Context
-    val mActivity: Activity
+    lateinit var mContext : Context
+    lateinit var mActivity: Activity
     lateinit var mLifeCycle: Lifecycle;
+
+    lateinit var mScreenshotManager : ScreenshotManager
+    val REQUEST_SCREENSHOT_PERMISSION = 888
+
+    lateinit var mDialogContext : Context
+    lateinit var mDialogActivity: Activity
+    lateinit var mDialogLifeCycle: Lifecycle;
 
     lateinit var firebaseAnalytics: FirebaseAnalytics;
     lateinit var firebaseAppLifecycleListener: FirebaseAppLifecycleListener;
     lateinit var firebaseApp: FirebaseApp;
     lateinit var firebaseOptions: FirebaseOptions;
 
-    init {
+    fun init (context : Context) {
         mContext  = context
         mActivity = context as Activity
+
         FunnelManager.setClientActivity(this);
         ActivityManager.setClientActivity(this);
         DataStorage.setClientActivity(this);
         Analytics.setClientActivity(this);
+
+        mScreenshotManager = ScreenshotManagerBuilder(mActivity)
+            .withPermissionRequestCode(REQUEST_SCREENSHOT_PERMISSION) //optional, 888 is the default
+            .build()
 
         //Await the moment the UI is rendered
         mActivity.window.decorView.doOnLayout  {
@@ -90,6 +111,32 @@ class Samla constructor(context : Context) : LifecycleObserver, SamlaBuilder, Fr
             }
 
         }
+    }
+
+    fun init (dialog : Dialog) {
+        mDialogContext = dialog.context
+        mDialogActivity = unwrap(mDialogContext)
+
+        val screenshotResult = mScreenshotManager.makeScreenshot()
+        val subscription = screenshotResult.observe(
+            onSuccess = { writeToFile(it) },
+            onError = { }
+        )
+    }
+
+    fun writeToFile(screenshot: Screenshot): File {
+        val fileSaver = ScreenshotFileSaver.create(Bitmap.CompressFormat.PNG)
+        val targetFile = File(mContext.filesDir, "screenshot")
+        fileSaver.saveToFile(targetFile, screenshot)
+        return targetFile
+    }
+
+    private fun unwrap(context: Context): Activity {
+        var mContext : Context = context
+        while (mContext !is Activity && mContext is ContextWrapper) {
+            mContext = mContext.baseContext
+        }
+        return mContext as Activity
     }
 
     override fun getActivity(): Activity {

@@ -167,4 +167,13 @@ object UIHierarchy {
         }
         return null
     }
+
+    fun getBitmap(v: View): Bitmap {
+        val b = Bitmap.createBitmap(v.width, v.height, Bitmap.Config.ARGB_8888)
+        val c = Canvas(b)
+        v.layout(0, 0, v.getWidth(), v.getHeight())
+        v.draw(c)
+        return b
+    }
+
 }
